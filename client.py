@@ -60,7 +60,6 @@ class Client:
 
             if data == "MOVE":
                 x, y = self.client_mouse_socket.recv(1024).decode().split(',')
-                print(f"Received command: {x}")
                 pyautogui.moveTo(int(x), int(y))
             elif data == "CLICK":
                 pyautogui.click()
@@ -79,7 +78,6 @@ class Client:
 if __name__ == '__main__':
     client = Client()
     client.run()
-
 
 
 
