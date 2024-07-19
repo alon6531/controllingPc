@@ -27,8 +27,14 @@ class Server:
         print(f'Server listening on {server_ip}:{server_port}')
         self.client_socket, client_address = self.server_tcp_socket.accept()
 
+        self.server_mouse_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server_mouse_socket.bind((server_ip, server_port + 2))
+        self.server_mouse_socket.listen(5)
+        print(f'Server listening on {server_ip}:{server_port}')
+        self.client_mouse_socket, client_address = self.server_mouse_socket.accept()
+
         threading.Thread(target=self.keyboard).start()
-        #threading.Thread(target=self.mouse).start()
+        threading.Thread(target=self.mouse).start()
 
     def receive_image(self):
         try:
@@ -78,10 +84,11 @@ class Server:
 
     def mouse(self):
         while True:
-            mouse_pos_x = pyautogui.position().x
-            self.client_socket.send(str(mouse_pos_x).encode())
-            mouse_pos_y = pyautogui.position().y
-            self.client_socket.send(str(mouse_pos_y).encode())
+            self.client_mouse_socket.send("MOVE".encode('utf-8'))
+            pyautogui.sleep(1)
+            pos_x = pyautogui.position().x
+            pos_y = pyautogui.position().y
+            self.client_mouse_socket.send(f"{pos_x},{pos_y}".encode('utf-8'))  # Move to position (100, 100)
 
     def keyboard(self):
         def on_key_event(event):
